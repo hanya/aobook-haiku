@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=aobook
+Exec=aobook %f
+Icon=aobook
+Terminal=false
+Categories=Utility;
+StartupNotify=true

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>aobook マニュアル</title>
+<style type="text/css">
+body{ font-family:sans-serif; font-size:11pt; background-color:white;
+ color:#404040; margin:20px; line-height:100%; }
+a:link,a:visited{ color:blue }
+a:hover{ color:#0066ff }
+th{ white-space:nowrap; }
+
+.menu{ padding:10px; border:solid 1px #ccc; font-size:10pt; margin-bottom:3em; }
+.menu ul{ margin-top:0; margin-bottom:0; }
+.menu li{ line-height:160%; }
+
+.ct_main{ border:solid 1px #888; }
+.ct_h{ background-color:#666; padding:4px 10px; color:white; font-weight:bold; }
+.ct_txt{ padding:13px; line-height:130%; }
+.ct_footer{ margin-bottom:2.5em; text-align:right; margin-top:2px; }
+.ct_txt ul{ line-height:150%; margin-top:0; margin-bottom:0; padding:0; }
+.ct_txt li{ margin-left:2em; margin-bottom:8px; padding:0; }
+
+.subb_main{ line-height:100%; margin-top:2em; }
+.subb_h{ font-weight:bold; border-bottom:3px solid #009; padding:4px 5px; color:#008; }
+.subb_txt{ padding:12px 0px 12px 10px; margin-left:20px; line-height:130%;
+ border:solid #009; border-width:0px 0px 1px 1px; background-color:#fafafa; }
+
+em{ font-style:normal; color:red; }
+.c1{ color:#FF35EF; font-weight:bold; }
+
+table{ border-collapse:collapse; background-color:white; }
+td,th{ padding:4px 5px; line-height:140%; border:solid 1px #888; }
+th{ background-color:#ddd; text-align:left; }
+</style>
+</head>
+<body>
+
+<a name="menu"></a>
+<div class="menu"><ul>
+<li><a href="#link1">テキストの扱いについて</a></li>
+<li><a href="#link2">挿絵の扱い</a></li>
+<li><a href="#link3">対応注記</a></li>
+<li><a href="#link4">しおり</a></li>
+<li><a href="#link5">スタイル設定</a></li>
+<li><a href="#link6">環境設定</a></li>
+</ul></div>
+
+<div class="ct_main">
+<div class="ct_h"><a name="link1">テキストの扱いについて</a></div>
+<div class="ct_txt">
+<ul>
+<li><span class="c1">Shift-JIS、EUC-JP、UTF-8、UTF-16BE/LE</span> の文字コードに対応しています。<br>
+<em>※ UTF-16 は BOM が付いている場合のみ。</em><br>
+ある程度自動でコードを判別することができますが、正しく読み込めなかった場合は、開くダイアログ上で文字コードを直接指定してください。</li>
+<li>ZIP で圧縮されたテキストファイルを直接読み込むことができます。<br>
+<em>※ ZIP 内の一番最初に格納されているファイルのみ。<br>
+※ ZIP 内の画像ファイルを挿絵として読み込むことはできません。</em></li>
+<li>半角の [<b>0-9、!、?</b>] が３文字まで連続して記述されている場合、自動で縦中横で表示されます。<br>
+(複数文字を１文字として横に並べる)</li>
+<li>文字の後に <span class="c1">「゛」(濁点)、「゜」(半濁点)</span> が続いている場合、その前の文字と合体させて濁点文字にします。</li>
+<li><span class="c1">「／＼」(くの字点表記)</span> は、自動で Unicode のくの字点文字に置換えられます。</li>
+</ul>
+</div>
+</div>
+<div class="ct_footer"><a href="#menu">↑ TOP</a></div>
+
+<div class="ct_main">
+<div class="ct_h"><a name="link2">挿絵の扱い</a></div>
+<div class="ct_txt">
+<ul>
+<li><span class="c1">［＃...（ファイル名[、...]）入る］</span> の形式のみ対応。</li>
+<li><b>BMP/PNG/JPEG</b> の画像を読み込めます。</li>
+<li>画像ファイルの場所は、読み込んだテキストファイルのディレクトリが基点となります。<br>
+<b>&quot;img/test.png&quot;</b> などのようにサブディレクトリ指定をしても問題ありません。</li>
+<li>１ページに１つの画像が表示されます。</li>
+<li>注記の幅・高さ指定は無視され、本文領域のサイズに縮小されるか、原寸サイズで中央に表示されます。</li>
+<li>圧縮ファイルからテキストを読み込んだ場合、圧縮ファイル内の画像を挿絵として読み込むことはできません。</li>
+</ul>
+</div>
+</div>
+<div class="ct_footer"><a href="#menu">↑ TOP</a></div>
+
+<div class="ct_main">
+<div class="ct_h"><a name="link3">対応注記</a></div>
+<div class="ct_txt">ルビ (｜《》)<br>
+<br>
+<span class="c1">■ 外字</span><br>
+※［＃「...」、第n水準?-??-??］ <b>(JIS X 0213 の第3、第4水準)</b><br>
+※［＃「...」、U+XXXX、ページ数-行数］ <b>(Unicode)</b><br>
+※［＃...、?-?-??］ <b>(JIS X 0213 面句点番号)</b><br>
+<br>
+改ページ、改頁、改丁、改見開き<br>
+ページの左右中央<br>
+<br>
+○字下げ<br>
+ここから○字下げ ... ここで字下げ終わり<br>
+ここから○字下げ、折り返して○字下げ ... ここで字下げ終わり<br>
+ここから改行天付き、折り返して○字下げ ... ここで字下げ終わり<br>
+地付き<br>
+ここから地付き ... ここで地付き終わり<br>
+地から○字上げ<br>
+ここから地から○字上げ ... ここで字上げ終わり<br>
+<br>
+「○○」は大見出し<br>
+「○○」は中見出し<br>
+「○○」は小見出し<br>
+大見出し ... 大見出し終わり<br>
+中見出し ... 中見出し終わり<br>
+小見出し ... 小見出し終わり<br>
+ここから大見出し ... ここで大見出し終わり<br>
+ここから中見出し ... ここで中見出し終わり<br>
+ここから小見出し ... ここで小見出し終わり<br>
+<br>
+「○○」に傍点<br>
+傍点 ... 傍点終わり<br>
+「○○」に傍線<br>
+傍線 ... 傍線終わり<br>
+<em>※ 傍点、傍線はすべての種類に対応しています。</em><br>
+<br>
+「○○」は太字<br>
+太字 ... 太字終わり<br>
+ここから太字 ... ここで太字終わり<br>
+<br>
+「○○」は縦中横<br>
+縦中横 ... 縦中横終わり<br>
+<br>
+「○○」は横組み<br>
+横組み ... 横組み終わり<br>
+ここから横組み ... ここで横組み終わり<br>
+<br>
+<span class="c1">■ 挿絵</span><br>
+［＃...（file）入る］<br>
+［＃...（file、横***×縦***）入る］ <em>※サイズは無視されます</em></div>
+</div>
+<div class="ct_footer"><a href="#menu">↑ TOP</a></div>
+
+<div class="ct_main">
+<div class="ct_h"><a name="link4">しおり</a></div>
+<div class="ct_txt">しおりには、「<span class="c1">グローバルしおり</span>」と「<span class="c1">ローカルしおり</span>」の２種類があります。<br>
+これらは用途によって使い分けてください。<br>
+<br>
+なお、しおりの位置情報は「<b>テキストファイルの行番号の位置</b>」で記録されます。<br>
+元のテキストの内容が変化すると位置がずれるので、注意してください。<br>
+<br>
+<table class="tbl1">
+<tr><th>グローバル</th><td>通常はこちらを使います。<br>
+<br>
+「ファイル名」と「テキスト行番号」が記録され、指定ファイルの指定位置を呼び出すことができます。<br>
+<br>
+このデータは、ソフト終了時に自動的に保存されます。<br>
+(設定ファイルディレクトリの「<b>bookmark.txt</b>」ファイル)</td></tr>
+<tr><th>ローカル</th><td>一つのファイルに多数のしおりを付けたい場合は、こちらを使います。<br>
+<br>
+「テキスト行番号」と「コメント」が記録され、現在開かれているファイルの指定位置へ飛ぶことができます。<br>
+ファイル名は記録されないので、注意してください。<br>
+<br>
+<em>※ このデータはソフト終了時に自動保存されません。</em><br>
+テキスト読込後に自分でしおりファイルを選択して読み込み、また、手動で保存する必要があります。</td></tr>
+</table>
+<div class="subb_main">
+<div class="subb_h">グローバルしおり</div>
+<div class="subb_txt">
+<ul>
+<li><b>追加</b><br>
+現在の位置を追加します。</li>
+<li><b>削除</b><br>
+選択されているしおりを削除します。</li>
+<li><b>呼出</b><br>
+選択されているしおりを呼び出します。<br>
+指定されたファイルを読み込んで記録された位置に移動します。<br>
+リスト上をダブルクリックして呼び出すこともできます。</li>
+</ul>
+</div></div>
+<div class="subb_main">
+<div class="subb_h">ローカルしおり</div>
+<div class="subb_txt">リスト上のアイテムを右クリックすると、メニューが表示されます。<br>
+アイテムをダブルクリックすると、その位置に移動します。<br>
+データは、テキストファイルとして保存されます。<br>
+<br>
+<ul>
+<li><b>追加</b><br>
+コメントを入力後、現在の位置を追加します。</li>
+<li><b>読込</b><br>
+ファイルからしおりデータを読み込みます。</li>
+<li><b>保存</b><br>
+現在のデータをファイルに保存します。</li>
+<li><b>クリア</b><br>
+データをすべてクリアします。</li>
+<li><b>ページ移動</b><br>
+選択された項目の位置に移動します。</li>
+<li><b>編集</b><br>
+コメントの編集を行います。</li>
+<li><b>削除</b><br>
+しおりデータを削除します。</li>
+</ul>
+</div></div>
+</div>
+</div>
+<div class="ct_footer"><a href="#menu">↑ TOP</a></div>
+
+<div class="ct_main">
+<div class="ct_h"><a name="link5">スタイル設定</a></div>
+<div class="ct_txt">表示スタイルの設定を行います。<br>
+<br>
+「<b>新規</b>」ボタンで、名前を入力して新規スタイルを作成します。<br>
+ここで指定した名前はメニューのスタイル一覧にも使われ、また、スタイルファイル名としても使われます。<br>
+<br>
+「<b>削除</b>」ボタンで、現在選択されているスタイルを削除します。<br>
+<div class="subb_main">
+<div class="subb_h">基本</div>
+<div class="subb_txt">
+<table class="tbl1">
+<tr><th>単一ページ/見開き</th><td>表示ページを一つにするか、２ページでの見開きとするかを指定します。</td></tr>
+<tr><th>文字数</th><td>縦方向の文字数。</td></tr>
+<tr><th>行数</th><td>１ページにおける横方向の文字数。</td></tr>
+<tr><th>字間/行間</th><td>文字と文字の間の空白、行と行の間の空白を px 単位で指定します。</td></tr>
+<tr><th>余白</th><td>各余白幅を px 単位で指定します。</td></tr>
+<tr><th>背景</th><td>背景色、または背景画像を指定します。<br>
+背景画像ファイル名が空の場合、背景色が使われます。<br>
+背景画像にはファイル名を指定します。画像形式は <b>BMP/PNG/JPEG</b> が使えます。<br>
+<br>
+背景画像を使う場合、描画方法を選択できます。<br>
+<b>画面に合わせる</b> : ウィンドウに合わせて画像を拡大縮小します。縦横比は維持されません。<br>
+<b>タイル状に並べる</b> : 原寸サイズでタイル状に画像を並べます。</td></tr>
+<tr><th>ぶら下げを行う</th><td>ON の場合、行頭禁則に該当し、ぶら下げ対象である文字の場合、次の行に文字を送らずに、現在の行の一番下に表示します。<br>
+OFF の場合は、常に次行に送られます。</td></tr>
+<tr><th>挿絵表示</th><td>挿絵を表示するかどうか。</td></tr>
+<tr><th>ページ数表示</th><td>上端にページ数を表示します。</td></tr>
+<tr><th>横線文字は直線として描画</th><td>横線の文字 (全角ダッシュ、罫線の細横線) はフォントで描画せずに、1px の直線として描画します。<br>
+この文字が複数続いている場合、フォントで描画すると文字の間に空白が出来る場合がありますが、直線として描画すれば全ての文字が一本の直線で繋がります。</td></tr>
+</table>
+</div></div>
+<div class="subb_main">
+<div class="subb_h">フォント</div>
+<div class="subb_txt">文字のフォントと色を指定します。<br>
+<br>
+<b>本文</b> : 本文の通常文字<br>
+<b>本文(太字)</b> : 本文内の太字の文字<br>
+<b>ルビ</b> : ルビ文字<br>
+<b>情報</b> : 本文以外の文字 (ページ数)</div></div>
+<div class="subb_main">
+<div class="subb_h">文字</div>
+<div class="subb_txt">特殊扱いする文字を指定します。<br>
+<br>
+「<b>1文字置換以外</b>」は、指定したい文字を複数並べて記述してください。<br>
+文字と文字の間に空白などは含めないでください。<br>
+<br>
+「<b>1文字置換</b>」の場合は、「置換元」と「置換後」の２つの文字を１組みにして記述します。<br>
+複数指定したい場合は、そのまま続けて次の２つの文字を記述します。<br>
+なお、この設定の場合のみ、半角スペースは無視されるので、任意で半角スペースを区切りとして使うことができます。<br>
+<br>
+<table class="tbl1">
+<tr><th>行頭禁則</th><td>行の先頭に来てはいけない文字 (「、。」など) を指定します。<br>
+この文字が行頭に来ようとした場合、その１つ前の文字が行頭に来るように折り返されます。</td></tr>
+<tr><th>行末禁則</th><td>行の終端に来てはいけない文字 (「 など) を指定します。<br>
+この文字が行末に来ようとした場合は、次の行に折り返されます。</td></tr>
+<tr><th>ぶら下げ</th><td>行頭禁則の文字の中で、ぶら下げを行う対象となる文字を指定します。<br>
+<em>※ 行頭禁則の文字に該当し、かつ、ぶら下げの文字にも該当する文字が対象となるので、行頭禁則にも同じ文字がないと動作しません。</em><br>
+<br>
+「<b>ぶら下げ</b>」とは、行頭禁則の対象となった文字を、次の行に折り返さずに、現在の行の最後にはみ出す形で置く処理のことです。<br>
+ぶら下げた文字は通常の本文枠内からはみ出すことになりますが、「、」や「。」などの句読点ははみ出てもあまり目立たないので、そういった文字の場合に使います。<br>
+<br>
+なお、スタイル設定で「<b>ぶら下げを行う</b>」のチェックが OFF の場合は、常に無効となります。</td></tr>
+<tr><th>分割禁止</th><td>「……」など、同じ文字が２回以上連続して記述されている場合に、連続した文字が途中で折り返されて別々の行に分割されてしまうのを防ぎたい場合、その文字を指定します。</td></tr>
+<tr><th>1文字置換</th><td>表示時に、本文中の１文字を別の文字に置換えたい場合に使います。<br>
+「置き換えたい文字」と「置換え後の文字」を２つペアにして記述します。<br>
+<br>
+例えば、「《」を通常の本文文字として表示したいが、「《」はルビの指定に使われるため、代わりとして記号の「≪」を記述した場合、「≪」は縦書きで表示されないので、そのままでは読みにくくなります。<br>
+そこで、１文字置換に「<b>≪《</b>」を設定すると、表示中は「≪」が「《」に置換えられるので、正しく縦書き表示が行えます。<br>
+(注記の処理をした後に本文文字として置換えられるので、置換えた「《」がルビ指定の注記文字として認識されることはありません)</td></tr>
+</table>
+</div></div>
+</div>
+</div>
+<div class="ct_footer"><a href="#menu">↑ TOP</a></div>
+
+<div class="ct_main">
+<div class="ct_h"><a name="link6">環境設定</a></div>
+<div class="ct_txt">
+<div class="subb_main" style="margin-top:0">
+<div class="subb_h">設定</div>
+<div class="subb_txt">
+<ul>
+<li><b>GUI フォント</b><br>
+GUI のフォントを変更します。<br>
+この設定は、次回の起動時に適用されます。</li>
+<li><b>起動時に前回のファイルを開く</b><br>
+ソフト起動時に、最後に開いたファイルを自動で開きます。</li>
+<li><b>ローカルしおり追加時、コメントを入力しない</b><br>
+ローカルしおりを追加する時に、コメントを入力せずに直接追加します。<br>
+コメントは空の状態となります。</li>
+</ul>
+</div></div>
+<div class="subb_main">
+<div class="subb_h">マウス操作</div>
+<div class="subb_txt">マウスの操作時に実行する処理を指定します。<br>
+左側のリストからマウス操作を選択し、右側のリストで、その操作が行われた時に実行するコマンドを選択します。</div></div>
+<div class="subb_main">
+<div class="subb_h">キー設定</div>
+<div class="subb_txt">ショートカットキーの設定を行います。<br>
+<br>
+まず、リストから設定したいコマンドを選択し、その後「キー」の入力欄内でコマンドに設定したいキーを押します。<br>
+正しい組み合わせであれば、それでキーが設定されます。<br>
+<br>
+「クリア」を押すと、現在のコマンドのキーをクリアできます。<br>
+「すべてクリア」で、すべてのコマンドのキーをクリアできます。</div></div>
+<div class="subb_main">
+<div class="subb_h">ツール</div>
+<div class="subb_txt">外部ツールを設定します。<br>
+最大 10 個まで設定できます。<br>
+<br>
+「追加」でツールを追加し、各情報を入力後、「置換」ボタンで設定を適用します。<br>
+<em>※ 「置換」ボタンを押さないと設定が変更されないので、注意してください。</em><br>
+<br>
+<table class="tbl1">
+<tr><th>表示名</th><td>メニューに表示する名前を指定します。</td></tr>
+<tr><th>コマンド</th><td>実行するコマンドを指定します。<br>
+以下の文字を記述すると、各情報に置換えられます。<br>
+<br>
+<b>%f</b> : 現在のテキストファイル名。特殊文字はエスケープされるので、「&quot;」などで囲む必要はありません。<br>
+<b>%l</b> (小文字のエル) : 現在のテキスト行番号 (1〜)<br>
+<b>%c</b> : 現在のファイルの文字コード名<br>
+<br>
+<b>[例]</b> leafpad --codeset=%c --jump=%l %f</td></tr>
+<tr><th>ショートカットキー</th><td>この入力欄内で設定したいキーを押すと、ショートカットキーとして登録することができます。</td></tr>
+</table>
+</div></div>
+</div>
+</div>
+<div class="ct_footer"><a href="#menu">↑ TOP</a></div>
+
+</body></html>
