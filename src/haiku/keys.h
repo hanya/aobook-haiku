@@ -25,67 +25,28 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 $*/
 
-#ifndef MLIB_FREETYPE_H
-#define MLIB_FREETYPE_H
+#ifndef KEYS_H_
+#define KEYS_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <InterfaceDefs.h>
+#include <MessageFilter.h>
+#include <String.h>
 
-typedef struct _FcPattern mFcPattern;
-typedef struct _mFontInfo mFontInfo;
 
-typedef struct _mFreeTypeInfo
+int32 ParseHaikuKey(uint8 byte, int32 key, uint32 raw_char, uint32 mod);
+
+void AddModifierStr(BString *str, uint32 mod);
+void AddKeyStr(BString *str, uint32 key);
+
+
+class KeyFilter : public BMessageFilter
 {
-	uint32_t flags,fLoadGlyph;
-	FT_Render_Mode nRenderMode;
-	int nLCDFilter;
-	double dpi,size;
-	FT_Matrix matrix;
-}mFreeTypeInfo;
-
-typedef struct
-{
-	int height,
-		lineheight,
-		baseline,
-		underline;
-}mFreeTypeMetricsInfo;
-
-
-#define MFTINFO_F_SUBPIXEL_BGR 1
-#define MFTINFO_F_EMBOLDEN     2
-#define MFTINFO_F_MATRIX       4
-
-enum MFT_HINTING
-{
-	MFT_HINTING_NONE,
-	MFT_HINTING_DEFAULT,
-	MFT_HINTING_MAX
+public:
+	KeyFilter(BHandler *handler);
+	virtual filter_result Filter(BMessage *msg, BHandler **target);
+	
+private:
+	BHandler *fHandler;
 };
-
-/*------*/
-
-void mFreeTypeGetInfoByFontConfig(mFreeTypeInfo *dst,mFcPattern *pat,mFontInfo *info);
-void mFreeTypeSetInfo_hinting(mFreeTypeInfo *dst,int type);
-
-void mFreeTypeGetMetricsInfo(FT_Library lib,FT_Face face,mFreeTypeInfo *info,
-	mFreeTypeMetricsInfo *dst);
-
-int mFreeTypeGetHeightFromGlyph(FT_Library lib,FT_Face face,
-	mFreeTypeInfo *info,int ascender,uint32_t code);
-
-FT_BitmapGlyph mFreeTypeGetBitmapGlyph(FT_Library lib,FT_Face face,mFreeTypeInfo *info,uint32_t code);
-#ifndef OS_HAIKU
-void *mFreeTypeGetGSUB(FT_Face face);
-#else
-void *mFreeTypeGetGSUB(FT_Face face, int *sotvalid);
-#endif
-mRgbCol mFreeTypeBlendColorGray(mRgbCol bgcol,mRgbCol fgcol,int a);
-mRgbCol mFreeTypeBlendColorLCD(mRgbCol bgcol,mRgbCol fgcol,int ra,int ga,int ba);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

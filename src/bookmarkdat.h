@@ -51,7 +51,9 @@ typedef struct
 	int lineno;
 }BmItemLocal;
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 void BookmarkFree();
 
 BmItemGlobal *BookmarkGlobal_add();
@@ -63,5 +65,7 @@ BmItemLocal *BookmarkLocal_add(mStr *strcomment);
 void BookmarkLocal_getListStr(mStr *str,BmItemLocal *pi);
 void BookmarkLocal_saveFile(const char *fname);
 void BookmarkLocal_loadFile(const char *fname);
-
+#ifdef __cplusplus
+}
+#endif
 #endif

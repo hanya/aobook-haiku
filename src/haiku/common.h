@@ -25,67 +25,65 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 $*/
 
-#ifndef MLIB_FREETYPE_H
-#define MLIB_FREETYPE_H
+#ifndef COMMON_H_
+#define COMMON_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "trid_menu.h"
 
-typedef struct _FcPattern mFcPattern;
-typedef struct _mFontInfo mFontInfo;
-
-typedef struct _mFreeTypeInfo
-{
-	uint32_t flags,fLoadGlyph;
-	FT_Render_Mode nRenderMode;
-	int nLCDFilter;
-	double dpi,size;
-	FT_Matrix matrix;
-}mFreeTypeInfo;
-
-typedef struct
-{
-	int height,
-		lineheight,
-		baseline,
-		underline;
-}mFreeTypeMetricsInfo;
-
-
-#define MFTINFO_F_SUBPIXEL_BGR 1
-#define MFTINFO_F_EMBOLDEN     2
-#define MFTINFO_F_MATRIX       4
-
-enum MFT_HINTING
-{
-	MFT_HINTING_NONE,
-	MFT_HINTING_DEFAULT,
-	MFT_HINTING_MAX
+enum {
+	CMD_RECENT = 'aorc',
+	CMD_EXIT = 'aoex',
+	
+	CMD_BOOKMARK_ADD_TO_GLOBAL = 'aobg',
+	CMD_BOOKMARK_ADD_TO_LOCAL = 'aobl',
+	
+	CMD_TOOL = 'tl',
+	CMD_STYLES = 'aosy',
+	
+	CMD_HELP_MANUAL = 'aohm',
 };
 
-/*------*/
 
-void mFreeTypeGetInfoByFontConfig(mFreeTypeInfo *dst,mFcPattern *pat,mFontInfo *info);
-void mFreeTypeSetInfo_hinting(mFreeTypeInfo *dst,int type);
+enum Encoding {
+	AUTO = 0,
+	SHIFT_JIS,
+	EUC_JP,
+	UTF_8,
+	UTF_16LE,
+	UTF_16BE,
+	
+	ENCODING_END,
+};
 
-void mFreeTypeGetMetricsInfo(FT_Library lib,FT_Face face,mFreeTypeInfo *info,
-	mFreeTypeMetricsInfo *dst);
 
-int mFreeTypeGetHeightFromGlyph(FT_Library lib,FT_Face face,
-	mFreeTypeInfo *info,int ascender,uint32_t code);
-
-FT_BitmapGlyph mFreeTypeGetBitmapGlyph(FT_Library lib,FT_Face face,mFreeTypeInfo *info,uint32_t code);
-#ifndef OS_HAIKU
-void *mFreeTypeGetGSUB(FT_Face face);
-#else
-void *mFreeTypeGetGSUB(FT_Face face, int *sotvalid);
-#endif
-mRgbCol mFreeTypeBlendColorGray(mRgbCol bgcol,mRgbCol fgcol,int a);
-mRgbCol mFreeTypeBlendColorLCD(mRgbCol bgcol,mRgbCol fgcol,int ra,int ga,int ba);
-
-#ifdef __cplusplus
-}
-#endif
+enum {
+	A_WINDOW_CLOSE = 'aowc',
+	A_SHOW_BOOKMARK_WIN = 'aosb',
+	A_MESSAGE_ERROR = 'aoer',
+	A_UPDATE_WINDOW = 'aoup',
+	A_RESIZE_WINDOW = 'aorw',
+	A_SET_TITLE = 'aosi',
+	A_UPDATE_RECENT_FILE_MENU = 'aour',
+	A_LOAD_FILE = 'aolf',
+	
+	A_GOTO_PAGE = 'agpg',
+	A_GOTO_LINE = 'agln',
+	A_RECENT_MENU_CHOOSE = 'agrm',
+	A_STYLE_MENU_CHOOSE = 'asmc',
+	A_STYLE_MENU_UPDAGE = 'asmu',
+	A_STYLE_UPDATE = 'asup',
+	A_UPDATE_TOOL_MENU = 'atmc',
+	
+	A_BOOKMARK_TAB_CHANGED = 'abkt',
+	A_ACC_KEYS_CHANGED = 'abac',
+	
+	A_HEADING_DIALOG_CLOSED = 'ahdc',
+	A_PAGE_DIALOG_CLOSED = 'apdc',
+	A_LINE_DIALOG_CLOSED = 'aldc',
+	A_STYLE_OPT_DIALOG_CLOSED = 'asdc',
+	A_ENV_OPT_DIALOG_CLOSED = 'aedc',
+	A_BOOKMARK_DIALOG_CLOSED = 'abdc',
+	
+};
 
 #endif

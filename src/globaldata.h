@@ -88,9 +88,10 @@ typedef struct _AO_PAGEINFO_ITEM AO_PAGEINDEX;
 
 typedef struct
 {
+#ifndef OS_HAIKU
 	MainWindow *mainwin;
 	BookmarkWin *bkmarkwin;
-
+#endif
 	mBox bkmarkwin_box;
 	int bkmarkwin_tabno;
 
@@ -109,7 +110,10 @@ typedef struct
 		*shortcutkey;
 	uint8_t fModify,
 		mousectrl[MOUSECTRL_BTT_NUM];
-
+#ifdef OS_HAIKU
+	uint8_t bkmarkwin_show;
+	mPoint mainwin_point;
+#endif
 	//
 
 	mBuf textbuf;	//テキストデータ
@@ -127,6 +131,9 @@ extern GlobalData *g_globaldat;
 
 /*---- func ----*/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void GlobalDataFree(GlobalData *p);
 mBool GlobalDataNew();
 
@@ -139,5 +146,7 @@ void GlobalGetRecentFileInfo(int no,mStr *strfname,int *code,int *line);
 
 void GlobalSetStyleToLayout();
 void GlobalSetLayoutFilePath();
-
+#ifdef __cplusplus
+}
+#endif
 #endif

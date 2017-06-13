@@ -25,67 +25,45 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 $*/
 
-#ifndef MLIB_FREETYPE_H
-#define MLIB_FREETYPE_H
+#ifndef BOOKMARK_WINDOW_H_
+#define BOOKMARK_WINDOW_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <Window.h>
 
-typedef struct _FcPattern mFcPattern;
-typedef struct _mFontInfo mFontInfo;
+#include <memory>
 
-typedef struct _mFreeTypeInfo
+class FileChooser;
+class InputDialog;
+class GlobalBookmarksView;
+class LocalBookmarksView;
+
+class BTabView;
+
+class BookmarkDialog : public BWindow
 {
-	uint32_t flags,fLoadGlyph;
-	FT_Render_Mode nRenderMode;
-	int nLCDFilter;
-	double dpi,size;
-	FT_Matrix matrix;
-}mFreeTypeInfo;
-
-typedef struct
-{
-	int height,
-		lineheight,
-		baseline,
-		underline;
-}mFreeTypeMetricsInfo;
-
-
-#define MFTINFO_F_SUBPIXEL_BGR 1
-#define MFTINFO_F_EMBOLDEN     2
-#define MFTINFO_F_MATRIX       4
-
-enum MFT_HINTING
-{
-	MFT_HINTING_NONE,
-	MFT_HINTING_DEFAULT,
-	MFT_HINTING_MAX
+public:
+	BookmarkDialog(BWindow *owner);
+	virtual ~BookmarkDialog();
+	virtual void Quit();
+	virtual void ShowDialog(BRect parent);
+	virtual void MessageReceived(BMessage *msg);
+	
+	static const int32 GLOBAL_ADD_NEW = 'bkga';
+	static const int32 LOCAL_ADD_NEW = 'bkla';
+	
+private:
+	BWindow *fOwner;
+	BTabView * fTabView;
+	GlobalBookmarksView * fGlobalBkView;
+	LocalBookmarksView * fLocalBkView;
+	InputDialog * fCommentDialog;
+	FileChooser * fFileLoadChooser;
+	FileChooser * fFileStoreChooser;
+	
+	void _SetList();
+	void _LoadLocal(entry_ref *ref);
+	void _SaveLocal(entry_ref *ref, const char *name);
+	
 };
-
-/*------*/
-
-void mFreeTypeGetInfoByFontConfig(mFreeTypeInfo *dst,mFcPattern *pat,mFontInfo *info);
-void mFreeTypeSetInfo_hinting(mFreeTypeInfo *dst,int type);
-
-void mFreeTypeGetMetricsInfo(FT_Library lib,FT_Face face,mFreeTypeInfo *info,
-	mFreeTypeMetricsInfo *dst);
-
-int mFreeTypeGetHeightFromGlyph(FT_Library lib,FT_Face face,
-	mFreeTypeInfo *info,int ascender,uint32_t code);
-
-FT_BitmapGlyph mFreeTypeGetBitmapGlyph(FT_Library lib,FT_Face face,mFreeTypeInfo *info,uint32_t code);
-#ifndef OS_HAIKU
-void *mFreeTypeGetGSUB(FT_Face face);
-#else
-void *mFreeTypeGetGSUB(FT_Face face, int *sotvalid);
-#endif
-mRgbCol mFreeTypeBlendColorGray(mRgbCol bgcol,mRgbCol fgcol,int a);
-mRgbCol mFreeTypeBlendColorLCD(mRgbCol bgcol,mRgbCol fgcol,int ra,int ga,int ba);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

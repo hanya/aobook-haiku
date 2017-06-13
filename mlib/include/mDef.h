@@ -43,12 +43,14 @@ typedef struct _mFont mFont;
 typedef void (*mDefEmptyFunc)();
 
 /* macro */
-
+#ifndef OS_HAIKU
 #undef NULL
+#endif
 #undef TRUE
 #undef FALSE
-
+#ifndef NULL
 #define NULL  ((void *)0)
+#endif
 #define TRUE  (1)
 #define FALSE (0)
 #define M_MATH_PI       (3.14159265358979323846)

@@ -180,6 +180,7 @@ mBool mDirEntryIsDirectory(mDirEntry *p)
 {
 	if(p && p->curent)
 	{
+#ifndef OS_HAIKU
 		if(p->curent->d_type == DT_UNKNOWN)
 		{
 			mFileStat st;
@@ -189,6 +190,13 @@ mBool mDirEntryIsDirectory(mDirEntry *p)
 		}
 		else
 			return (p->curent->d_type == DT_DIR);
+#else
+		mFileStat st;
+		
+		if (mDirEntryGetStat(p, &st)) {
+			return ((st.flags & MFILESTAT_F_DIRECTORY) != 0);
+		}
+#endif
 	}
 
 	return FALSE;

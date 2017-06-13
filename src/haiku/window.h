@@ -25,67 +25,65 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 $*/
 
-#ifndef MLIB_FREETYPE_H
-#define MLIB_FREETYPE_H
+#ifndef WINDOW_H_
+#define WINDOW_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-typedef struct _FcPattern mFcPattern;
-typedef struct _mFontInfo mFontInfo;
+#include <Window.h>
 
-typedef struct _mFreeTypeInfo
+#include <map>
+#include <memory>
+
+class BMenu;
+class BookmarkDialog;
+class EnvOptDialog;
+class FileChooser;
+class HeadingDialog;
+class InputDialog;
+class PageView;
+class StyleOptDialog;
+struct entry_ref;
+
+class AoBookWindow : public BWindow
 {
-	uint32_t flags,fLoadGlyph;
-	FT_Render_Mode nRenderMode;
-	int nLCDFilter;
-	double dpi,size;
-	FT_Matrix matrix;
-}mFreeTypeInfo;
-
-typedef struct
-{
-	int height,
-		lineheight,
-		baseline,
-		underline;
-}mFreeTypeMetricsInfo;
-
-
-#define MFTINFO_F_SUBPIXEL_BGR 1
-#define MFTINFO_F_EMBOLDEN     2
-#define MFTINFO_F_MATRIX       4
-
-enum MFT_HINTING
-{
-	MFT_HINTING_NONE,
-	MFT_HINTING_DEFAULT,
-	MFT_HINTING_MAX
+public:
+	AoBookWindow(BPoint pos);
+	virtual ~AoBookWindow();
+	virtual void MessageReceived(BMessage *msg);
+	virtual bool QuitRequested();
+	
+private:
+	BMenuBar * _CreateMenu();
+	void _Open();
+	
+	void _NextFile(bool nxt);
+	void _NextPage(bool nxt);
+	void _MovePage(bool first);
+	void _MovePageNo(int32 page);
+	void _MoveLineNo(int32 line);
+	void _UpdateRecentFileMenu();
+	void _UpdateStyleMenu();
+	void _UpdateToolMenu();
+	void _OpenFile(const entry_ref &ref, int32 code);
+	void _ChooseRecentFile(int32 index);
+	void _MouseFunc(int32 f);
+	void _InitAccKeys();
+	int32 _Key(uint8 byte, int32 key, uint32 raw_char, uint32 mod);
+	
+	std::unique_ptr<FileChooser> fFileChooser;
+	InputDialog * fPageDialog;
+	InputDialog * fLineDialog;
+	HeadingDialog * fHeadingDialog;
+	StyleOptDialog * fStyleOptDialog;
+	EnvOptDialog * fEnvOptDialog;
+	BookmarkDialog * fBookmarkDialog;
+	InputDialog * fBookmarkCommentDialog;
+	BMenu * fRecentMenu;
+	BMenu * fStyleMenu;
+	BMenu * fToolMenu;
+	PageView * fPageView;
+	std::map<uint16, uint16> fAccKeys;
+	
 };
-
-/*------*/
-
-void mFreeTypeGetInfoByFontConfig(mFreeTypeInfo *dst,mFcPattern *pat,mFontInfo *info);
-void mFreeTypeSetInfo_hinting(mFreeTypeInfo *dst,int type);
-
-void mFreeTypeGetMetricsInfo(FT_Library lib,FT_Face face,mFreeTypeInfo *info,
-	mFreeTypeMetricsInfo *dst);
-
-int mFreeTypeGetHeightFromGlyph(FT_Library lib,FT_Face face,
-	mFreeTypeInfo *info,int ascender,uint32_t code);
-
-FT_BitmapGlyph mFreeTypeGetBitmapGlyph(FT_Library lib,FT_Face face,mFreeTypeInfo *info,uint32_t code);
-#ifndef OS_HAIKU
-void *mFreeTypeGetGSUB(FT_Face face);
-#else
-void *mFreeTypeGetGSUB(FT_Face face, int *sotvalid);
-#endif
-mRgbCol mFreeTypeBlendColorGray(mRgbCol bgcol,mRgbCol fgcol,int a);
-mRgbCol mFreeTypeBlendColorLCD(mRgbCol bgcol,mRgbCol fgcol,int ra,int ga,int ba);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

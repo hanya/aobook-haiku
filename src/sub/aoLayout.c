@@ -35,8 +35,9 @@ $*/
 #include "aoLayout.h"
 
 #include "mList.h"
+#ifndef OS_HAIKU
 #include "mPopupProgress.h"
-
+#endif // OS_HAIKU
 
 
 //==========================
@@ -272,9 +273,10 @@ void aoSetLayoutFirst(AO_LAYOUT_INFO *info,mPopupProgress *poppg)
 		lf.cur = lf.next;
 
 		//進捗
-
+#ifndef OS_HAIKU
 		mPopupProgressThreadSetPos(poppg,
 			(int)((double)(dat.text - topbuf) / info->srcsize * 100 + 0.5));
+#endif // OS_HAIKU
 	}
 
 	//ページ数

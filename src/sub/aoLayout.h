@@ -71,7 +71,9 @@ typedef struct _AO_LAYOUT_INFO
 		listTitle;		//見出しデータ
 }AO_LAYOUT_INFO;
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 void aoFreeLayoutInfo(AO_LAYOUT_INFO *info);
 
 void aoGetScreenSize(AO_LAYOUT_INFO *info,mSize *sz);
@@ -86,5 +88,7 @@ int aoGetPageLineNo(AO_PAGEINDEX *pi);
 
 void aoSetLayoutFirst(AO_LAYOUT_INFO *info,mPopupProgress *poppg);
 void aoDrawPage(AO_LAYOUT_INFO *info,mPixbuf *img,AO_PAGEINDEX *page);
-
+#ifdef __cplusplus
+}
+#endif
 #endif

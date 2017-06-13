@@ -25,67 +25,57 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 $*/
 
-#ifndef MLIB_FREETYPE_H
-#define MLIB_FREETYPE_H
+#include <stdlib.h>
+#include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "mDef.h"
+#include "mDefGui.h"
 
-typedef struct _FcPattern mFcPattern;
-typedef struct _mFontInfo mFontInfo;
+#include "mPixbuf.h"
+#include "mPixbuf_pv.h"
 
-typedef struct _mFreeTypeInfo
-{
-	uint32_t flags,fLoadGlyph;
-	FT_Render_Mode nRenderMode;
-	int nLCDFilter;
-	double dpi,size;
-	FT_Matrix matrix;
-}mFreeTypeInfo;
+#include <Bitmap.h>
+
 
 typedef struct
 {
-	int height,
-		lineheight,
-		baseline,
-		underline;
-}mFreeTypeMetricsInfo;
+	mPixbuf b;
+	mPixbufPrivate p;
+	
+	BBitmap *bitmap;
+} __mPixbufHaiku;
 
-
-#define MFTINFO_F_SUBPIXEL_BGR 1
-#define MFTINFO_F_EMBOLDEN     2
-#define MFTINFO_F_MATRIX       4
-
-enum MFT_HINTING
+extern "C"
+mPixbuf *__mPixbufAlloc(void)
 {
-	MFT_HINTING_NONE,
-	MFT_HINTING_DEFAULT,
-	MFT_HINTING_MAX
-};
-
-/*------*/
-
-void mFreeTypeGetInfoByFontConfig(mFreeTypeInfo *dst,mFcPattern *pat,mFontInfo *info);
-void mFreeTypeSetInfo_hinting(mFreeTypeInfo *dst,int type);
-
-void mFreeTypeGetMetricsInfo(FT_Library lib,FT_Face face,mFreeTypeInfo *info,
-	mFreeTypeMetricsInfo *dst);
-
-int mFreeTypeGetHeightFromGlyph(FT_Library lib,FT_Face face,
-	mFreeTypeInfo *info,int ascender,uint32_t code);
-
-FT_BitmapGlyph mFreeTypeGetBitmapGlyph(FT_Library lib,FT_Face face,mFreeTypeInfo *info,uint32_t code);
-#ifndef OS_HAIKU
-void *mFreeTypeGetGSUB(FT_Face face);
-#else
-void *mFreeTypeGetGSUB(FT_Face face, int *sotvalid);
-#endif
-mRgbCol mFreeTypeBlendColorGray(mRgbCol bgcol,mRgbCol fgcol,int a);
-mRgbCol mFreeTypeBlendColorLCD(mRgbCol bgcol,mRgbCol fgcol,int ra,int ga,int ba);
-
-#ifdef __cplusplus
+	__mPixbufHaiku *p = (__mPixbufHaiku *)mMalloc(sizeof(__mPixbufHaiku), TRUE);
+	p->bitmap = NULL;
+	return (mPixbuf *)p;
 }
-#endif
 
-#endif
+extern "C"
+mPixbuf *__mPixbufFree(mPixbuf *p)
+{
+	__mPixbufHaiku *pHaiku = (__mPixbufHaiku *)p;
+	delete pHaiku->bitmap;
+}
+
+extern "C"
+mPixbuf *__mPixbufCreate(mPixbuf *p, int w, int h)
+{
+	__mPixbufHaiku *pHaiku = (__mPixbufHaiku *)p;
+	if (pHaiku->bitmap != NULL) {
+		__mPixbufFree(p);
+	}
+	
+	BBitmap *bitmap = new BBitmap(BRect(0, 0, w, h), 0, B_RGB32);
+	
+	pHaiku->bitmap = bitmap;
+	
+	p->w = w;
+	p->h = h;
+	p->bpp = 4;
+	p->pitch = p->pitch_dir = (int)bitmap->BytesPerRow();
+	p->buf = p->buftop = (unsigned char *)bitmap->Bits();
+	return 0;
+}

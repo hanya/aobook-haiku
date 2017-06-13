@@ -36,8 +36,10 @@ $*/
 #include "mAppDef.h"
 #include "mGui.h"
 #include "mStr.h"
+#ifndef OS_HAIKU
 #include "mWidget.h"
 #include "mWindow.h"
+#endif // OS_HAIKU
 #include "mIniRead.h"
 #include "mIniWrite.h"
 #include "mKeyDef.h"
@@ -45,8 +47,10 @@ $*/
 #include "globaldata.h"
 #include "style.h"
 #include "mainfunc.h"
+#ifndef OS_HAIKU
 #include "mainwindow.h"
 #include "bookmarkwin.h"
+#endif // OS_HAIKU
 #include "bookmarkdat.h"
 #include "trid_menu.h"
 
@@ -54,7 +58,9 @@ $*/
 #include "aoFont.h"
 
 #include "deftrans.h"
-
+#ifdef OS_HAIKU
+#include "func.h"
+#endif
 
 //----------------------
 
@@ -122,19 +128,31 @@ static void _save_config()
 	mIniWriteInt(fp, "ver", 1);
 
 	//ウィンドウ
+#ifndef OS_HAIKU
 
 	mWindowGetFrameRootPos(M_WINDOW(p->mainwin), &pt);
 	
 	mIniWritePoint(fp, "mainwin", &pt);
+#else
+	mIniWritePoint(fp, "mainwin", &p->mainwin_point);
+#endif
+#ifndef OS_HAIKU
 	mIniWriteInt(fp, "mainwin_maximize", mWindowIsMaximized(M_WINDOW(p->mainwin)));
-
+#else
+	// todo, check window size is the same with the screen size is the way
+	mIniWriteInt(fp, "mainwin_maximize", 0);
+#endif // OS_HAIKU
 	//しおりウィンドウ
-
+#ifndef OS_HAIKU
 	if(p->bkmarkwin)
 		mWindowGetSaveBox(M_WINDOW(p->bkmarkwin), &p->bkmarkwin_box);
-
+#endif // OS_HAIKU
 	mIniWriteBox(fp, "bkmarkwin", &p->bkmarkwin_box);
+#ifndef OS_HAIKU
 	mIniWriteInt(fp, "bkmarkwin_show", (p->bkmarkwin != 0));
+#else
+	mIniWriteInt(fp, "bkmarkwin_show", (p->bkmarkwin_show != 0));
+#endif // OS_HAIKU
 	mIniWriteInt(fp, "bkmarkwin_tab", p->bkmarkwin_tabno);
 
 	//
@@ -266,6 +284,9 @@ static void _load_config(ConfigData *dat)
 
 	mIniReadBox(p, "bkmarkwin", &gd->bkmarkwin_box, -10000, -10000, -10000, -10000);
 	dat->show_bkmark = mIniReadInt(p, "bkmarkwin_show", 0);
+#ifdef OS_HAIKU
+	gd->bkmarkwin_show = dat->show_bkmark ? 1 : 0;
+#endif
 	gd->bkmarkwin_tabno = mIniReadInt(p, "bkmarkwin_tab", 0);
 
 	//
@@ -308,7 +329,9 @@ static void _load_config(ConfigData *dat)
 
 static mBool _init(int argc,char **argv)
 {
+#ifndef OS_HAIKU
 	MainWindow *mainwin;
+#endif
 	ConfigData dat;
 
 	//設定ファイル用ディレクトリ作成
@@ -341,26 +364,26 @@ static mBool _init(int argc,char **argv)
 	//グローバルしおり読み込み
 
 	BookmarkGlobal_loadFile();
-
+#ifndef OS_HAIKU
 	//GUI フォント作成
 
 	if(!mStrIsEmpty(&GDAT->strGUIFont))
 		mAppSetDefaultFont(GDAT->strGUIFont.buf);
-
+#endif // OS_HAIKU
 	//メインウィンドウ作成
-
+#ifndef OS_HAIKU
 	mainwin = MainWindowNew();
 	if(!mainwin) return FALSE;
 
 	//ウィンドウ表示
 
 	MainWindow_show(mainwin, &dat.ptMainWin, dat.mainwin_maximize);
-
+#endif // OS_HAIKU
 	//しおりウィンドウ表示
-
+#ifndef OS_HAIKU
 	if(dat.show_bkmark)
 		BookmarkWinNew();
-
+#endif
 	//ファイルを開く
 
 	if(argc >= 2)
@@ -371,15 +394,27 @@ static mBool _init(int argc,char **argv)
 
 		mStrSetTextLocal(&str, argv[1], -1);
 		
+#ifndef OS_HAIKU
 		mfLoadTextFile(str.buf, -1, 0, FALSE);
-
+#else
+		mfAppRun(&dat.ptMainWin, dat.show_bkmark, str.buf, -1);
+#endif
 		mStrFree(&str);
 	}
 	else if((GDAT->optflags & OPTFLAGS_OPEN_LASTFILE)
 				&& !mStrIsEmpty(GDAT->strRecentFile))
+#ifndef OS_HAIKU
 		//前回のファイル
 		mfLoadTextFileFromRecent(0);
-
+#else
+	{
+		mfAppRun(&dat.ptMainWin, dat.show_bkmark, NULL, 0);
+	}
+	else
+	{
+		mfAppRun(&dat.ptMainWin, dat.show_bkmark, NULL, -1);
+	}
+#endif // OS_HAIKU
 	return TRUE;
 }
 
@@ -415,7 +450,7 @@ static void _finish()
 int main(int argc,char **argv)
 {
 	if(mAppInit(&argc, argv)) return 1;
-
+#ifndef OS_HAIKU
 	//パス
 
 	mAppSetConfigPath(".aobook", TRUE);
@@ -428,19 +463,21 @@ int main(int argc,char **argv)
 	mAppLoadTranslation(g_deftransdat, NULL, PACKAGE_DATA_DIR);
 
 	//初期化
-
+#else
+	mAppSetConfigPath("aobook", TRUE);
+#endif // OS_HAIKU
 	if(!_init(argc, argv))
 	{
 		fputs("! failed initialize\n", stderr);
 		return -1;
 	}
-
+#ifndef OS_HAIKU
 	//実行
 
 	mAppRun();
 
 	//終了
-
+#endif
 	_finish();
 
 	mAppEnd();

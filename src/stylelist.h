@@ -34,6 +34,10 @@ $*/
 
 #define STYLELISTITEM(p)  ((StyleListItem *)(p))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
 	mListItem i;
@@ -49,5 +53,9 @@ StyleListItem *StyleListLoad(mList *list,const char *name);
 
 int StyleListApplyCurrent(StyleListItem *pi);
 void StyleListSaveAndDelete(mList *list);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

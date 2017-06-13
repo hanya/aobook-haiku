@@ -350,18 +350,83 @@ FT_BitmapGlyph mFreeTypeGetBitmapGlyph(FT_Library lib,
 	return (FT_BitmapGlyph)glyph;
 }
 
+#ifdef OS_HAIKU
+#include "mBufOperate.h"
+
+static void *mFreeTypeFindTable(void *base, unsigned long size, uint32_t tag)
+{
+	uint16_t num_tables;
+	uint32_t dtag, offset;
+	int i;
+	mBufOperate op;
+	
+	if (base == NULL || size < 4) {
+		return NULL;
+	}
+	mBufOpInit(&op, base, size, MBUFOPERATE_ENDIAN_BIG);
+	mBufOpRead32(&op, &dtag);
+	if (size > 12 && dtag == 0x00010000 || dtag == 0x4F54544F) {
+		mBufOpRead16(&op, &num_tables);
+		mBufOpSeek(&op, 6);
+		for (i = 0; i < num_tables; ++i) {
+			mBufOpRead32(&op, &dtag);
+			if (dtag == tag) {
+				mBufOpSeek(&op, 4);
+				mBufOpRead32(&op, &offset);
+				if (offset < size) {
+					return base + offset;
+				} else {
+					break;
+				}
+			}
+			mBufOpSeek(&op, 12);
+		}
+	}
+	return NULL;
+}
+#endif
+
 /** GSUB テーブル取得
  *
  * @return <code>FT_OpenType_Free(face, (FT_Bytes)gsub)</code> で解放すること */
-
+#ifndef OS_HAIKU
 void *mFreeTypeGetGSUB(FT_Face face)
+#else
+void *mFreeTypeGetGSUB(FT_Face face, int *sotvalid)
+#endif
 {
 	FT_Bytes base,gdef,gpos,gsub = 0,jstf;
-
+#ifndef OS_HAIKU
 	if(FT_OpenType_Validate(face, FT_VALIDATE_GSUB, &base,&gdef,&gpos,&gsub,&jstf) == 0)
 		return (void *)gsub;
 	else
+		return NULL; // todo, implement for not supported
+#else
+	FT_ULong table_len;
+	FT_Error err;
+	err = FT_OpenType_Validate(face, FT_VALIDATE_GSUB, &base,&gdef,&gpos,&gsub,&jstf);
+	if (err == 0) {
+		return (void *)gsub;
+	} else if (err == FT_Err_Unimplemented_Feature) {
+		// otvalid module is not contained, lets parse font header
+		if (face->stream != NULL && face->stream->base != NULL) {
+			//err = FT_Load_Sfnt_Table(face, FT_MAKE_TAG('G', 'S', 'U', 'B'), 0,
+			//	&gsub, &table_len);
+			/*
+			printf("err: %d\n", err);
+			if (err == 0) {
+				return (void *)gsub;
+			}
+			*/
+			*sotvalid = 1;
+			return mFreeTypeFindTable(face->stream->base, face->stream->size,
+					0x47535542); // GSUB
+		}
 		return NULL;
+	} else {
+		return NULL;
+	}
+#endif // OS_HAIKU
 }
 
 /** グレイスケール用アルファブレンド */

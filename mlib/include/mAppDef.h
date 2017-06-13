@@ -33,6 +33,7 @@ typedef struct _mAppSystem  mAppSystem;
 
 typedef struct _mApp
 {
+#ifndef OS_HAIKU
 	mAppPrivate *pv;
 	mAppSystem  *sys;
 
@@ -42,7 +43,7 @@ typedef struct _mApp
 			*widgetGrabKey;
 	
 	mFont *fontDefault;
-
+#endif
 	char *pathConfig,
 		*pathData;
 
@@ -68,7 +69,9 @@ enum MAPP_FLAGS
 };
 
 #define MAPP     (g_mApp)
+#ifndef OS_HAIKU
 #define MAPP_SYS (g_mApp->sys)
 #define MAPP_PV  (g_mApp->pv)
+#endif
 
 #endif

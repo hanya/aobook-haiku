@@ -1,0 +1,133 @@
+1	English	x-vnd.azsky.aobook	2738994228
+Last page	aobook		終端ページ
+Page number	aobook		ページ番号
+Italic	aobook		イタリック
+Failed to convert the string into Unicode.	aobook		Unicode への変換に失敗
+Filter	aobook		フィルタ
+Mouse	aobook		マウス
+Help	aobook		ヘルプ
+Character	aobook		文字
+Add	aobook		追加
+UTF-16LE	aobook		UTF-16LE
+PNG files (*.png)	aobook		PNG ファイル (*.png)
+Name	aobook		名前
+OK	aobook		OK
+Add to global	aobook		グローバルへ追加
+...	aobook		...
+Encoding	aobook		文字コード
+Comment	aobook		コメント
+Chars	aobook		文字数
+Line pitch	aobook		行間
+Do you want to delete?	aobook		削除しますか？
+Background color	aobook		背景色
+NO	aobook		いいえ
+Exit	aobook		終了
+Go to page...	aobook		ページ番号指定...
+Style	aobook		スタイル
+Local	aobook		ローカルしおり
+Basic	aobook		基本
+Enable hanging	aobook		ぶら下げを行う
+Next file	aobook		次のファイル
+Next page	aobook		次のページ
+Zip files (*.zip)	aobook		Zip ファイル (*.zip)
+Body	aobook		本文
+Heading	aobook		見出し
+Failed to load the file.	aobook		ファイルの読み込みに失敗
+Tools	aobook		ツール
+Oblique	aobook		斜体
+Wheel up	aobook		ホイール上
+Right button	aobook		右ボタン
+Left button	aobook		左ボタン
+No comments for local bookmarks.	aobook		ローカルしおり追加時、コメントを入力しない
+Line number (1-)	aobook		行番号 (1-)
+Font	aobook		フォント
+Input style name	aobook		スタイル名入力
+Fit	aobook		画面に合わせる
+Rendering	aobook		レンダリング
+Clear	aobook		全削除
+Replacement	aobook		1文字置換
+Center	aobook		見開き中央
+Roman	aobook		ローマン
+Left	aobook		左
+Do you want to clear local bookmarks?	aobook		すべてクリアします。よろしいですか？
+Background image	aobook		背景画像
+No memory.	aobook		メモリが足りません
+Weight	aobook		ウェイト
+Right	aobook		右
+%f: file name, %l: line number, %c: character encoding	aobook		%f: ファイル名, %l: 行番号, %c: 文字コード
+Global	aobook		グローバル
+Background	aobook		背景
+All clear	aobook		全削除
+Lines	aobook		行数
+Style name conflicts with the existing one.	aobook		同名のスタイルが存在します。
+Single	aobook		単一ページ
+Set of target character and replacement characters.\nHalfwidth space can be used as separator.\nex. ≪《 ≫》	aobook		置換元と置換後の2文字を1組にして記述。\n半角スペースは無視されるので区切りとして使って良い。\n(例) ≪《 ≫》
+Previous page	aobook		前のページ
+Top	aobook		上
+Settings...	aobook		設定...
+UTF-16BE	aobook		UTF-16BE
+Tile	aobook		タイル状に並べる
+Normal	aobook		普通
+Replace	aobook		置換
+Previous file	aobook		前のファイル
+Page number (%d-%d)	aobook		ページ番号 (%d-%d)
+Open	aobook		開く
+Show illustration	aobook		挿絵表示
+Hanging	aobook		ぶら下げ
+Wheel down	aobook		ホイール下
+Open last file at starting.	aobook		起動時に前回のファイルを開く
+Line number	aobook		テキスト行番号指定
+Size	aobook		サイズ
+File	aobook		ファイル
+Command	aobook		コマンド
+Pagination	aobook		ページ数表示
+Bookmark	aobook		しおり
+Bookmarks...	aobook		しおり一覧...
+Margin	aobook		余白
+Add to local...	aobook		ローカルへ追加...
+Delete	aobook		削除
+Char pitch	aobook		字間
+None	aobook		なし
+Comment (leave empty with no comment)	aobook		コメント (空でコメントなし)
+Ruby	aobook		ルビ
+Reload	aobook		再読込
+Tool	aobook		ツール
+Option	aobook		オプション
+Information	aobook		情報
+Go to line...	aobook		テキスト行番号指定...
+New	aobook		新規
+Move	aobook		移動
+Slant	aobook		斜体
+Bookmarks	aobook		しおり
+Settings	aobook		設定
+Edit	aobook		Edit
+Style settings...	aobook		スタイル設定...
+Color picker	aobook		カラーピッカー
+Spread	aobook		見開き
+New style	aobook		新規
+Store	aobook		保存
+No separation	aobook		分割禁止
+Not at end	aobook		行末禁則
+Cancel	aobook		キャンセル
+'ー' as line	aobook		'ー'は直線として描写
+All files (*.*)	aobook		全ファイル (*.*)
+Bottom	aobook		下
+Shortcut key	aobook		ショートカットキー
+First page	aobook		先頭ページ
+JPEG files (*.jpg)	aobook		JPEG ファイル (*.jpg)
+Heading...	aobook		見出し...
+Text files (*.txt)	aobook		Text ファイル (*.txt)
+Version information...	aobook		バージョン情報...
+Load	aobook		読込
+UTF-8	aobook		UTF-8
+Shift-JIS	aobook		Shift-JIS
+Environmental settings	aobook		環境設定
+EUC-JP	aobook		EUC-JP
+Bold	aobook		太字
+Key	aobook		キー
+Manual	aobook		マニュアル
+YES	aobook		はい
+Call	aobook		呼出
+Auto	aobook		自動
+Not at start	aobook		行頭禁則
+Body (bold)	aobook		本文 (太字)

@@ -43,6 +43,9 @@ enum
 	AOTEXT_CODE_NUM
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* aoTextLoad.c */
 int aoTextConvUnicode(mBuf *srcbuf,mBuf *dstbuf,int code);
 const char *aoTextGetCodeName(int code);
@@ -50,5 +53,7 @@ const char *aoTextGetCodeName_conv(int code);
 
 /* aoTextConv.c */
 mBool aoTextConvert(mBuf *textbuf,mBuf *dstbuf);
-
+#ifdef __cplusplus
+}
+#endif
 #endif

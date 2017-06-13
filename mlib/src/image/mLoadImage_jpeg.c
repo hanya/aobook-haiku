@@ -393,9 +393,11 @@ static int _read_headers(_LOADJPEG *p)
 
 	if(p->param->format != MLOADIMAGE_FORMAT_RAW)
 	{
+#ifdef JCS_ALPHA_EXTENSIONS
 		if(p->param->format == MLOADIMAGE_FORMAT_RGBA)
 			jpg->out_color_space = JCS_EXT_RGBA;
 		else
+#endif
 			jpg->out_color_space = JCS_RGB;
 	}
 

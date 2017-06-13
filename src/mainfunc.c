@@ -32,23 +32,33 @@ $*/
 #include "mDef.h"
 #include "mStr.h"
 #include "mGui.h"
+#ifndef OS_HAIKU
 #include "mWidget.h"
 #include "mWindow.h"
 #include "mMessageBox.h"
 #include "mPopupProgress.h"
+#else
+#include "mThread.h"
+#include "mPixbuf.h"
+#endif // OS_HAIKU
 #include "mFileList.h"
 #include "mUtilFile.h"
 #include "mUtilSys.h"
 
 #include "globaldata.h"
 #include "mainfunc.h"
+#ifndef OS_HAIKU
 #include "mainwindow.h"
+#endif // OS_HAIKU
 #include "trgroup.h"
 #include "trid.h"
 
 #include "aoText.h"
 #include "aoLayout.h"
-
+#ifdef OS_HAIKU
+#include "func.h"
+#include "style.h"
+#endif
 
 //----------------------
 
@@ -141,14 +151,16 @@ int _loadTextFile(const char *filename,int code)
 static void _thread_setlayout(mThread *th)
 {
 	aoSetLayoutFirst(GDAT->layout, (mPopupProgress *)th->param);
-
+#ifndef OS_HAIKU
 	mPopupProgressThreadEnd();
+#endif
 }
 
 /** 最初のレイアウト情報セット (読み込み/スタイル変更時) */
 
 static void _setFirstLayout()
 {
+#ifndef OS_HAIKU
 	mPopupProgress *p;
 	int w;
 	mBox box;
@@ -166,6 +178,18 @@ static void _setFirstLayout()
 	GDAT->bNowThread = FALSE;
 
 	mWidgetDestroy(M_WIDGET(p));
+#else
+	mThread *th;
+	th = mThreadNew(0, _thread_setlayout, 0);
+	if (!th) {
+		return;
+	}
+	GDAT->bNowThread = TRUE;
+	mThreadRun(th);
+	mThreadWait(th);
+	mThreadDestroy(th);
+	GDAT->bNowThread = FALSE;
+#endif
 }
 
 
@@ -206,8 +230,11 @@ void mfLoadTextFile(const char *filename,int code,int linepage,mBool reload)
 			case _LOADTEXT_ERR_BUF: n = TRMES_ERR_BUF; break;
 			default: n = TRMES_ERR_LOADFILE; break;
 		}
-
+#ifndef OS_HAIKU
 		mMessageBoxErrTr(M_WINDOW(GDAT->mainwin), TRGROUP_MESSAGE, n);
+#else
+		mfMessageBoxErrTr(TRGROUP_MESSAGE, n);
+#endif // OS_HAIKU
 	}
 	else
 	{
@@ -226,8 +253,11 @@ void mfLoadTextFile(const char *filename,int code,int linepage,mBool reload)
 			//履歴セット
 
 			GlobalAddRecentFile(filename, code, linepage);
-
+#ifndef OS_HAIKU
 			MainWindow_setRecentFileMenu(GDAT->mainwin);
+#else
+			mfUpdateRecentFileMenu();
+#endif
 		}
 
 		//レイアウト
@@ -335,23 +365,29 @@ void mfReLayout()
 
 void mfUpdateScreen()
 {
+#ifndef OS_HAIKU
 	mWidgetUpdate(GDAT->mainwin->main.widgetDraw);
+#else
+	mfUpdate();
+#endif
 }
 
 /** スタイル変更後の更新 */
 
 void mfUpdateChangeStyle(mBool relayout)
 {
+#ifndef OS_HAIKU
 	MainWindow *p = GDAT->mainwin;
 	mWidget *wgdraw;
+#endif
 	mSize size;
-
+#ifndef OS_HAIKU
 	//画面サイズ変更
 
 	wgdraw = p->main.widgetDraw;
-
+#endif
 	aoGetScreenSize(GDAT->layout, &size);
-
+#ifndef OS_HAIKU
 	if(wgdraw->w != size.w || wgdraw->h != size.h)
 	{
 		wgdraw->hintW = size.w;
@@ -363,7 +399,9 @@ void mfUpdateChangeStyle(mBool relayout)
 
 		mWidgetResize(M_WIDGET(p), p->wg.hintW, p->wg.hintH);
 	}
-
+#else
+	mfWindowResize(size.w, size.h);
+#endif
 	//再レイアウト
 
 	if(relayout)
@@ -389,9 +427,11 @@ void mfSetWindowTitle()
 		mStrAppendText(&str, aoTextGetCodeName(GDAT->charcode));
 		mStrAppendChar(&str, ']');
 	}
-
+#ifndef OS_HAIKU
 	mWindowSetTitle(M_WINDOW(GDAT->mainwin), str.buf);
-
+#else
+	mfWindowSetTitle(str.buf);
+#endif // OS_HAIKU
 	mStrFree(&str);
 }
 

@@ -183,6 +183,9 @@ static void _setFontData(aoFont *font,FT_Face face)
 	void *gsub;
 	FT_BitmapGlyph glyph;
 	mFreeTypeMetricsInfo metrics;
+#ifdef OS_HAIKU
+	int sotvalid;
+#endif
 
 	//キャッシュ (最低でも1必要)
 
@@ -193,13 +196,20 @@ static void _setFontData(aoFont *font,FT_Face face)
 	font->hasVert = FT_HAS_VERTICAL(face);
 
 	//縦書きグリフテーブル
-
+#ifndef OS_HAIKU
 	gsub = mFreeTypeGetGSUB(face);
-
+#else
+	sotvalid = 0;
+	gsub = mFreeTypeGetGSUB(face, &sotvalid);
+#endif // OS_HAIKU
 	if(gsub)
 	{
 		font->vertTbl = mFTGSUB_getVertTable(gsub);
 		
+#ifdef OS_HAIKU
+		font->hasVert = TRUE;
+		if (sotvalid == 0)
+#endif
 		FT_OpenType_Free(face, (FT_Bytes)gsub);
 	}
 

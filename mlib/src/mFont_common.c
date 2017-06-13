@@ -53,7 +53,7 @@ void mFontInfoFree(mFontInfo *p)
 	mStrFree(&p->strFamily);
 	mStrFree(&p->strStyle);
 }
-
+#ifndef OS_HAIKU
 /** 文字列フォーマットからフォント作成 */
 
 mFont *mFontCreateFromFormat(const char *format)
@@ -92,7 +92,7 @@ mFont *mFontCreateFromFormat_size(const char *format,double size)
 
 	return font;
 }
-
+#endif // OS_HAIKU
 /** フォント情報を記述した文字列から mFontInfo 取得
  *
  * @attention p は初期化しておくこと。 @n

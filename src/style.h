@@ -77,10 +77,15 @@ void StyleInit(StyleData *p);
 
 void StyleSetDefault(StyleData *p);
 void StyleCopyData(StyleData *dst,StyleData *src);
+#ifdef __cplusplus
+extern "C" {
+#endif
 mBool StyleChange(StyleData *pd,StyleData *ps);
 mBool StyleChangeByName(const char *name);
 
 void StyleCreateFont(StyleData *p);
 void StyleSetUTF32Text(uint32_t **ppbuf,const char *text);
-
+#ifdef __cplusplus
+}
+#endif
 #endif

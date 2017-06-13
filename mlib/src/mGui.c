@@ -42,18 +42,23 @@ $*/
 
 #include "mGui.h"
 #include "mUtil.h"
+#ifndef OS_HAIKU
 #include "mWidget.h"
+#endif // OS_HAIKU
 #include "mEvent.h"
 #include "mPixbuf.h"
 #include "mPixbuf_pv.h"
 #include "mRectBox.h"
+#ifndef OS_HAIKU
 #include "mFont.h"
+#endif // OS_HAIKU
 #include "mStr.h"
 #include "mUtilFile.h"
 
 #include "mEventList.h"
+#ifndef OS_HAIKU
 #include "mWidget_pv.h"
-
+#endif // OS_HAIKU
 
 //--------------------------
 
@@ -61,12 +66,12 @@ mApp *g_mApp = NULL;
 uint32_t g_mSysCol[MSYSCOL_NUM * 2];
 
 //--------------------------
-
+#ifndef OS_HAIKU
 int __mAppInit(void);
 void __mAppEnd(void);
 void __mAppQuit(void);
 int __mAppRun(mBool fwait);
-
+#endif // OS_HAIKU
 //--------------------------
 
 
@@ -74,7 +79,7 @@ int __mAppRun(mBool fwait);
 // sub
 //============================
 
-
+#ifndef OS_HAIKU
 /** 全ウィジェット削除 */
 
 static void _app_DestroyAllWidget(void)
@@ -92,11 +97,11 @@ static void _app_DestroyAllWidget(void)
 
 	mFree(MAPP->widgetRoot);
 }
-
+#endif
 /** コマンドラインオプション
  *
  * ※ここで処理されたオプションは削除する。 */
-
+#ifndef OS_HAIKU
 static void _app_SetCmdlineOpt(int *argc,char **argv)
 {
 	int num,f,i,j;
@@ -150,7 +155,8 @@ static void _app_SetCmdlineOpt(int *argc,char **argv)
 	
 	*argc = num;
 }
-
+#endif
+#ifndef OS_HAIKU
 /** デフォルトフォント作成 */
 
 static int _app_CreateDefaultFont(void)
@@ -166,7 +172,7 @@ static int _app_CreateDefaultFont(void)
 
 	return (MAPP->fontDefault == NULL);
 }
-
+#endif
 /** システムカラーセット */
 
 static void _app_SetSysCol(void)
@@ -210,7 +216,7 @@ static void _app_SetSysCol(void)
 	for(i = 0; i < MSYSCOL_NUM; i++)
 		g_mSysCol[MSYSCOL_NUM + i] = rgb[i];
 }
-
+#ifndef OS_HAIKU
 /** ループデータ初期化 */
 
 static void _rundat_init(mAppRunDat *p)
@@ -222,7 +228,7 @@ static void _rundat_init(mAppRunDat *p)
 	MAPP_PV->runCurrent = p;
 	MAPP_PV->runLevel++;
 }
-
+#endif
 
 //=============================
 // メイン関数
@@ -241,7 +247,6 @@ static void _rundat_init(mAppRunDat *p)
 
 *************************/
 
-
 /** 終了処理
  *
  * すべてのウィジェットは自動で削除される。 */
@@ -251,7 +256,7 @@ void mAppEnd(void)
 	mApp *p = MAPP;
 
 	if(!p) return;
-	
+#ifndef OS_HAIKU
 	//全ウィジェット削除
 	
 	if(p->widgetRoot)
@@ -279,16 +284,18 @@ void mAppEnd(void)
 		mTranslationFree(&p->pv->transDef);
 		mTranslationFree(&p->pv->transApp);
 	}
-
+#endif
 	//パス文字列
 
 	mFree(p->pathConfig);
 	mFree(p->pathData);
 	
+#ifndef OS_HAIKU
 	//メモリ解放
 	
 	mFree(p->pv);
 	mFree(p->sys);
+#endif
 	mFree(p);
 	
 	MAPP = NULL;
@@ -314,6 +321,7 @@ int mAppInit(int *argc,char **argv)
 	MAPP = (mApp *)mMalloc(sizeof(mApp), TRUE);
 	if(!MAPP) return -1;
 	
+#ifndef OS_HAIKU
 	//mAppPrivate 確保
 	
 	MAPP_PV = (mAppPrivate *)mMalloc(sizeof(mAppPrivate), TRUE);
@@ -327,15 +335,15 @@ int mAppInit(int *argc,char **argv)
 	//コマンドラインオプション
 	
 	_app_SetCmdlineOpt(argc, argv);
-	
+#endif
 	//システム別の初期化
 	
 	if(__mAppInit()) goto ERR;
 	
 	//デフォルトフォント作成
-	
+#ifndef OS_HAIKU
 	if(_app_CreateDefaultFont()) goto ERR;
-	
+#endif
 	//RGB シフト数
 
 	MAPP->r_shift_left = mGetBitOnPos(MAPP->maskR);
@@ -345,11 +353,11 @@ int mAppInit(int *argc,char **argv)
 	MAPP->r_shift_right = 8 - mGetBitOffPos(MAPP->maskR >> MAPP->r_shift_left);
 	MAPP->g_shift_right = 8 - mGetBitOffPos(MAPP->maskG >> MAPP->g_shift_left);
 	MAPP->b_shift_right = 8 - mGetBitOffPos(MAPP->maskB >> MAPP->b_shift_left);
-
+#ifndef OS_HAIKU
 	//システムカラーセット
 
 	_app_SetSysCol();
-	
+#endif
 	return 0;
 
 ERR:
@@ -367,7 +375,7 @@ void mAppBlockUserAction(mBool on)
 	else
 		MAPP->flags &= ~MAPP_FLAGS_BLOCK_USER_ACTION;
 }
-
+#ifndef OS_HAIKU
 /** メインループを抜ける */
 
 void mAppQuit(void)
@@ -384,7 +392,8 @@ void mAppQuit(void)
 		}
 	}
 }
-
+#endif // OS_HAIKU
+#ifndef OS_HAIKU
 /** メインループ */
 
 void mAppRun(void)
@@ -398,7 +407,8 @@ void mAppRun(void)
 	MAPP_PV->runCurrent = dat.runBack;
 	MAPP_PV->runLevel--;
 }
-
+#endif // OS_HAIKU
+#ifndef OS_HAIKU
 /** メインループ (モーダルウィンドウ)
  *
  * 指定ウィンドウ以外はアクティブにならない。 */
@@ -446,7 +456,7 @@ mWindow *mAppGetCurrentModalWindow()
 	else
 		return NULL;
 }
-
+#endif // OS_HAIKU
 
 //=========================
 // パス
@@ -510,6 +520,10 @@ void mAppSetConfigPath(const char *path,mBool bHome)
 		mStr str = MSTR_INIT;
 
 		mStrPathSetHomeDir(&str);
+#ifdef OS_HAIKU
+		mStrPathAdd(&str, "config");
+		mStrPathAdd(&str, "settings");
+#endif
 		mStrPathAdd(&str, path);
 
 		MAPP->pathConfig = mStrdup(str.buf);
@@ -590,7 +604,7 @@ void mAppCopyFile_dataToConfig(const char *path)
 @{
 
 */
-
+#ifndef OS_HAIKU
 /** デフォルトフォントを作成してセット */
 
 mBool mAppSetDefaultFont(const char *format)
@@ -647,7 +661,7 @@ void mGuiCalcHintSize(void)
 		__mWidgetCalcHint(p);
 	}
 }
-
+#endif // OS_HAIKU
 /** @fn int mKeyCodeToName(uint32_t c,char *buf,int bufsize)
  *
  * MKEY_* のキーコードからキー名の文字列を取得
@@ -658,7 +672,7 @@ void mGuiCalcHintSize(void)
 
 /* @} */
 
-
+#ifndef OS_HAIKU
 //=================================
 // <mTrans.h> 翻訳
 //=================================
@@ -782,8 +796,8 @@ const char *mTransGetText2Raw(uint16_t groupid,uint16_t strid)
 }
 
 /* @} */
-
-
+#endif // OS_HAIKU
+#ifndef OS_HAIKU
 //=================================
 // sub - イベント処理後
 //=================================
@@ -885,7 +899,7 @@ mBool __mAppAfterEvent(void)
 
 	return mGuiUpdate();
 }
-
+#endif // OS_HAIKU
 
 //=============================
 // <mDef.h> 色変換

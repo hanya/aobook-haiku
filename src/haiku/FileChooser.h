@@ -25,67 +25,79 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 $*/
 
-#ifndef MLIB_FREETYPE_H
-#define MLIB_FREETYPE_H
+#ifndef FILE_CHOOSER_H_
+#define FILE_CHOOSER_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "common.h"
 
-typedef struct _FcPattern mFcPattern;
-typedef struct _mFontInfo mFontInfo;
+#include <Looper.h>
+#include <FilePanel.h>
 
-typedef struct _mFreeTypeInfo
+#include <memory>
+#include <vector>
+
+class BFilePanel;
+class BMenu;
+class BMessenger;
+
+
+class FileFilter : public BRefFilter
 {
-	uint32_t flags,fLoadGlyph;
-	FT_Render_Mode nRenderMode;
-	int nLCDFilter;
-	double dpi,size;
-	FT_Matrix matrix;
-}mFreeTypeInfo;
-
-typedef struct
-{
-	int height,
-		lineheight,
-		baseline,
-		underline;
-}mFreeTypeMetricsInfo;
-
-
-#define MFTINFO_F_SUBPIXEL_BGR 1
-#define MFTINFO_F_EMBOLDEN     2
-#define MFTINFO_F_MATRIX       4
-
-enum MFT_HINTING
-{
-	MFT_HINTING_NONE,
-	MFT_HINTING_DEFAULT,
-	MFT_HINTING_MAX
+public:
+	FileFilter();
+	~FileFilter();
+	virtual bool Filter(const entry_ref* ref, BNode *node,
+						struct stat_beos* stat, const char *mimeType);
+	
+	void AddFileFilter(const char *name, const char *ext);
+	int32 FilterIndex();
+	bool SetFilterIndex(int32 index);
+	const char * FilterName(int32 index);
+	int32 FilterCount();
+	
+	
+private:
+	typedef struct {
+		std::string name;
+		std::vector<std::string> filters;
+	} FilterItem;
+	std::vector<FilterItem> fFilters;
+	int32 fFilterIndex;
+	
 };
 
-/*------*/
 
-void mFreeTypeGetInfoByFontConfig(mFreeTypeInfo *dst,mFcPattern *pat,mFontInfo *info);
-void mFreeTypeSetInfo_hinting(mFreeTypeInfo *dst,int type);
-
-void mFreeTypeGetMetricsInfo(FT_Library lib,FT_Face face,mFreeTypeInfo *info,
-	mFreeTypeMetricsInfo *dst);
-
-int mFreeTypeGetHeightFromGlyph(FT_Library lib,FT_Face face,
-	mFreeTypeInfo *info,int ascender,uint32_t code);
-
-FT_BitmapGlyph mFreeTypeGetBitmapGlyph(FT_Library lib,FT_Face face,mFreeTypeInfo *info,uint32_t code);
-#ifndef OS_HAIKU
-void *mFreeTypeGetGSUB(FT_Face face);
-#else
-void *mFreeTypeGetGSUB(FT_Face face, int *sotvalid);
-#endif
-mRgbCol mFreeTypeBlendColorGray(mRgbCol bgcol,mRgbCol fgcol,int a);
-mRgbCol mFreeTypeBlendColorLCD(mRgbCol bgcol,mRgbCol fgcol,int ra,int ga,int ba);
-
-#ifdef __cplusplus
-}
-#endif
+class FileChooser : public BLooper
+{
+public:
+	FileChooser(BLooper *looper, 
+		file_panel_mode mode=B_OPEN_PANEL, FileFilter * filter=NULL,
+		bool encoding=false, int32 kind=0);
+	virtual ~FileChooser();
+	virtual void MessageReceived(BMessage *msg);
+	void Show();
+	virtual bool QuitRequested();
+	
+private:
+	BMessage * _CreateFilterMessage(int32 index);
+	BMessage * _CreateEncodingMssage(Encoding encoding);
+	void _SwitchMenuItem(BMenu *menu, const char *name, int32 v);
+	
+	//std::unique_ptr<FileFilter> fFileFilter;
+	FileFilter * fFileFilter;
+	std::unique_ptr<BFilePanel> fFilePanel;
+	
+	Encoding fEncoding;
+	int32 fKind;
+	
+	BMenu * fEncodingMenu;
+	BMenu * fFilterMenu;
+	
+	BLooper * fTarget;
+	
+	static const int32 SET_ENCODING = 'sten';
+	static const int32 CHANGE_FILTER = 'chfl';
+	
+};
 
 #endif
