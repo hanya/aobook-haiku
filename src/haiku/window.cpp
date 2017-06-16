@@ -690,6 +690,7 @@ void AoBookWindow::MessageReceived(BMessage *msg)
 		case A_STYLE_UPDATE:
 		{
 			mfUpdateChangeStyle(TRUE);
+			fPageView->Invalidate();
 			break;
 		}
 		case A_UPDATE_TOOL_MENU:

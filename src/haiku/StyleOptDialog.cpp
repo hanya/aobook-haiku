@@ -443,7 +443,7 @@ private:
 	EditStyles * fEditStyles;
 	
 	void _UpdateFontData(FontButton *btn, const char *info, bool base=false);
-	void _StoreFontData(FontButton *btn, mStr *str, bool base=false);
+	void _StoreFontData(FontButton *btn, mStr *str);
 };
 
 StyleOptFontView::StyleOptFontView()
@@ -472,6 +472,7 @@ StyleOptFontView::StyleOptFontView()
 		.AddItem("LCD (BGR)", new BMessage(CMD_RENDERING))
 		.AddItem("LCD (V RGB)", new BMessage(CMD_RENDERING))
 		.AddItem("LCD (V BGR)", new BMessage(CMD_RENDERING));
+	fRenderingPM->ItemAt(0)->SetMarked(true);
 	
 	BMenuField * renderingMF = new BMenuField("renderingMF", "", fRenderingPM);
 	
@@ -508,7 +509,7 @@ void StyleOptFontView::StoreData()
 	}
 	StyleData data = fEditStyles->current->dat;
 	
-	_StoreFontData(fBodyFontButton, &data.strFontText, true);
+	_StoreFontData(fBodyFontButton, &data.strFontText);
 	_StoreFontData(fBodyBoldFontButton, &data.strFontBold);
 	_StoreFontData(fRubyFontButton, &data.strFontRuby);
 	_StoreFontData(fInfoFontButton, &data.strFontInfo);
@@ -520,7 +521,7 @@ void StyleOptFontView::StoreData()
 	fEditStyles->current->dat = data;
 }
 
-void StyleOptFontView::_StoreFontData(FontButton *btn, mStr *str, bool base)
+void StyleOptFontView::_StoreFontData(FontButton *btn, mStr *str)
 {
 	mFontInfo info;
 	info.mask = 0;
@@ -559,12 +560,10 @@ void StyleOptFontView::_StoreFontData(FontButton *btn, mStr *str, bool base)
 		info.mask |= MFONTINFO_MASK_SLANT;
 	}
 	
-	if (base) {
-		int index = fRenderingPM->FindMarkedIndex();
-		if (0 <= index && index <= MFONTINFO_RENDER_LCD_VBGR) {
-			info.render = index;
-			info.mask |= MFONTINFO_MASK_RENDER;
-		}
+	int index = fRenderingPM->FindMarkedIndex();
+	if (0 <= index && index <= MFONTINFO_RENDER_LCD_VBGR) {
+		info.render = index;
+		info.mask |= MFONTINFO_MASK_RENDER;
 	}
 	
 	mFontInfoToFormat(str, &info);
@@ -896,13 +895,12 @@ void StyleOptDialog::MessageReceived(BMessage *msg)
 			
 			StyleListSaveAndDelete(fEditStyles->styles);
 			
-			if (StyleChange(GDAT->style, &fEditStyles->current->dat)) {
-				fOwner->PostMessage(A_STYLE_UPDATE);
-			}
-			
 			if (fStyleListChanged) {
 				fOwner->PostMessage(A_STYLE_MENU_UPDAGE);
 			}
+			
+			StyleChange(GDAT->style, &fEditStyles->current->dat);
+			fOwner->PostMessage(A_STYLE_UPDATE);
 			
 			Quit();
 			break;
