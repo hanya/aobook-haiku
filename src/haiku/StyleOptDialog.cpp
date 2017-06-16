@@ -887,8 +887,10 @@ void StyleOptDialog::MessageReceived(BMessage *msg)
 		{
 			// store data
 			_StoreData();
-			
-			Hide();
+			// Do not hide here. It makes update the main window and 
+			// crashes by the access while font update. 
+			// todo, needs lock for GDAT->style
+			//Hide();
 			
 			fStyleListChanged = !mStrPathCompareEq(&GDAT->style->strName, 
 									fEditStyles->current->dat.strName.buf);
@@ -902,6 +904,7 @@ void StyleOptDialog::MessageReceived(BMessage *msg)
 			StyleChange(GDAT->style, &fEditStyles->current->dat);
 			fOwner->PostMessage(A_STYLE_UPDATE);
 			
+			Hide();
 			Quit();
 			break;
 		}

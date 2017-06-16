@@ -201,6 +201,7 @@ void PageView::Draw(BRect rect)
 		Invalidate();
 		return;
 	}
+	// todo, avoid access to font data while style change
 	
 	__mPixbufHaiku *pHaiku = (__mPixbufHaiku *)fPixbuf;
 	if (pHaiku != NULL && pHaiku->bitmap != NULL) {
