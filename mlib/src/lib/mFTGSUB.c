@@ -66,7 +66,9 @@ typedef struct
 {
 	mBufOperate op;
 	mMemAuto mem;
-	int featurePos,lookupPos;
+	int scriptPos,featurePos,lookupPos;
+	uint16_t featureIndexCount;
+	intptr_t featureIndices;
 }parseGSUBDat;
 
 
@@ -252,19 +254,40 @@ static void _parseFeature(parseGSUBDat *dat)
 {
 	mBufOperate *op = &dat->op;
 	int i,j;
+	int feature_count;
 	intptr_t bkpos;
 	uint32_t tag;
 	uint16_t offset,lookup_index,lookup_prev = 0xffff;
+	uint16_t feature_index;
+	int use_feature;
 
 	mBufOpSetPos(op, dat->featurePos);
 
-	for(i = mBufOpGet16(op); i > 0; i--)
+	feature_count = mBufOpGet16(op);
+	
+	for(i = 0; i < feature_count; i++)
 	{
 		mBufOpRead32(op, &tag);
 		mBufOpRead16(op, &offset);
 
-		// "vert" か "vrt2" のみ。
+		use_feature = 0;
+		bkpos = mBufOpSetPosRet(op, dat->featureIndices);
+		for (j = dat->featureIndexCount; j > 0; j--)
+		{
+			mBufOpRead16(op, &feature_index);
+			if (i == feature_index)
+			{
+				use_feature = 1;
+				break;
+			}
+		}
+		mBufOpSetPos(op, bkpos);
+		if (!use_feature)
+		{
+			continue;
+		}
 
+		// "vert" か "vrt2" のみ。
 		if(tag == 0x76657274 || tag == 0x76727432)
 		{
 			//FeatureTable
@@ -294,6 +317,87 @@ static void _parseFeature(parseGSUBDat *dat)
 
 	//終了
 	mMemAutoAppendByte(&dat->mem, ENDMARK);
+}
+
+
+/* [ScriptList]
+ * uint16 scriptCount: レコードの数
+ * ScriptRecord scriptRecords[scriptCount]: レコードの配列
+ * 
+ * [ScriptRecord]
+ * Tag scriptTag: 識別子
+ * Offset16 scriptOffset: ScriptList を先頭としたオフセット
+ * 
+ * [Script]
+ * Offset16 defaultLangSys
+ * uint16 langSysCount: レコードの数
+ * LangSysRecord langSysRecords[langSysCount]: レコードの配列
+ * 
+ * [LangSysRecord]
+ * Tag langSysTag: 識別子
+ * Offset16 langSysOffset: Script を先頭としたオフセット
+ * 
+ * [LangSys]
+ * Offset16 lookupOrder: 予約
+ * uint16 requiredFeatureIndex: この言語系に必要なもののインデックス
+ * uint16 featureIndexCount
+ * uint16 featureIndices[featureIndexCount]
+ */
+static void _parseScript(parseGSUBDat *dat)
+{
+	mBufOperate *op = &dat->op;
+	int i, j;
+	int found = 0;
+	intptr_t bkpos, scriptpos;
+	uint32_t tag;
+	uint16_t offset;
+	mBufOpSetPos(op, dat->scriptPos);
+
+	for (i = mBufOpGet16(op); i > 0; i--)
+	{
+		// ScriptRecord
+		mBufOpRead32(op, &tag);
+		mBufOpRead16(op, &offset);
+
+		// kana
+		if (tag == 0x6b616e61)
+		{
+			// Script
+
+			scriptpos = dat->scriptPos + offset;
+			bkpos = mBufOpSetPosRet(op, dat->scriptPos + offset);
+
+			mBufOpSeek(op, 2);
+
+			for (j = mBufOpGet16(op); j > 0; j--)
+			{
+				// LangSysRecord
+				mBufOpRead32(op, &tag);
+				mBufOpRead16(op, &offset);
+
+				// JAN 
+				if (tag == 0x4a414e20)
+				{
+					found = 1;
+					// LangSys
+
+					mBufOpSetPos(op, scriptpos + offset); // head of Script
+					mBufOpSeek(op, 4); // to index count
+
+					// keep feature index count and start of feature indices
+					mBufOpRead16(op, &dat->featureIndexCount);
+					dat->featureIndices = mBufOpSetPosRet(op, 0);
+					break;
+				}
+			}
+
+			mBufOpSetPos(op, bkpos);
+		}
+		if (found)
+		{
+			break;
+		}
+	}
 }
 
 
@@ -340,15 +444,23 @@ void *mFTGSUB_getVertTable(void *gsub)
 
 	//各ブロックのオフセット
 
-	mBufOpSeek(&dat.op, 2);
+	//mBufOpSeek(&dat.op, 2);
+	dat.scriptPos  = mBufOpGet16(&dat.op);
 	dat.featurePos = mBufOpGet16(&dat.op);
 	dat.lookupPos  = mBufOpGet16(&dat.op);
+	dat.featureIndexCount = 0;
+	dat.featureIndices = 0;
 
 	//------- 解析
 
 	if(!mMemAutoAlloc(&dat.mem, 1024, 1024)) return FALSE;
 
-	_parseFeature(&dat);
+	_parseScript(&dat);
+
+	if (dat.featureIndexCount > 0)
+	{
+		_parseFeature(&dat);
+	}
 
 	//結果をコピー
 

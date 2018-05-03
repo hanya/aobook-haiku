@@ -208,7 +208,7 @@ static void _setFontData(aoFont *font,FT_Face face)
 		
 #ifdef OS_HAIKU
 		font->hasVert = TRUE;
-		if (sotvalid == 0)
+		if (sotvalid)
 #endif
 		FT_OpenType_Free(face, (FT_Bytes)gsub);
 	}

@@ -353,19 +353,56 @@ FT_BitmapGlyph mFreeTypeGetBitmapGlyph(FT_Library lib,
 #ifdef OS_HAIKU
 #include "mBufOperate.h"
 
-static void *mFreeTypeFindTable(void *base, unsigned long size, uint32_t tag)
+static void *mFreeTypeFindTable(FT_Face face, uint32_t tag)
 {
 	uint16_t num_tables;
 	uint32_t dtag, offset;
 	int i;
 	mBufOperate op;
-	
-	if (base == NULL || size < 4) {
+	void* base = face->stream->base;
+	uint32_t size = face->stream->size;
+	int valid, count;
+
+	if (base == NULL || size < 12)
+	{
 		return NULL;
 	}
+
 	mBufOpInit(&op, base, size, MBUFOPERATE_ENDIAN_BIG);
 	mBufOpRead32(&op, &dtag);
-	if (size > 12 && dtag == 0x00010000 || dtag == 0x4F54544F) {
+
+	// ttcf, font collection
+	if (dtag == 0x74746366)
+	{
+		valid = 1;
+
+		mBufOpSeek(&op, 4); // skip version
+		mBufOpRead32(&op, &count);
+		if (face->face_index > count)
+		{
+			return NULL;
+		}
+		if (size < count * 4 + 12) {
+			return NULL;
+		}
+		mBufOpSeek(&op, 4 * face->face_index);
+		mBufOpRead32(&op, &offset);
+		if (offset > size) {
+			return NULL;
+		}
+		if (size < offset + 12) {
+			return NULL;
+		}
+		// move to face
+		mBufOpSetPos(&op, offset);
+
+		mBufOpRead32(&op, &dtag);
+		valid == (dtag == 0x00010000 || dtag == 0x4F54544F);
+	} else {
+		valid == (dtag == 0x00010000 || dtag == 0x4F54544F);
+	}
+
+	if (valid) {
 		mBufOpRead16(&op, &num_tables);
 		mBufOpSeek(&op, 6);
 		for (i = 0; i < num_tables; ++i) {
@@ -406,21 +443,14 @@ void *mFreeTypeGetGSUB(FT_Face face, int *sotvalid)
 	FT_Error err;
 	err = FT_OpenType_Validate(face, FT_VALIDATE_GSUB, &base,&gdef,&gpos,&gsub,&jstf);
 	if (err == 0) {
+		*sotvalid = 1;
 		return (void *)gsub;
-	} else if (err == FT_Err_Unimplemented_Feature) {
+	} else if (err == FT_Err_Unimplemented_Feature ||
+				err == FT_Err_Invalid_Table) {
 		// otvalid module is not contained, lets parse font header
 		if (face->stream != NULL && face->stream->base != NULL) {
-			//err = FT_Load_Sfnt_Table(face, FT_MAKE_TAG('G', 'S', 'U', 'B'), 0,
-			//	&gsub, &table_len);
-			/*
-			printf("err: %d\n", err);
-			if (err == 0) {
-				return (void *)gsub;
-			}
-			*/
-			*sotvalid = 1;
-			return mFreeTypeFindTable(face->stream->base, face->stream->size,
-					0x47535542); // GSUB
+			*sotvalid = 0;
+			return mFreeTypeFindTable(face, 0x47535542); // GSUB
 		}
 		return NULL;
 	} else {
